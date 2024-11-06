@@ -4,7 +4,13 @@
  */
 package view;
 
+import DatabaseConnection.DatabaseConnection;
 import font.SetFont;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -12,6 +18,7 @@ import font.SetFont;
  */
 public class login extends javax.swing.JFrame {
     private SetFont font ;
+    private DatabaseConnection databaseconnection;
     
 
     /**
@@ -19,6 +26,7 @@ public class login extends javax.swing.JFrame {
      */
     public login() {
         font = new SetFont();
+        databaseconnection = new DatabaseConnection();
         initComponents();
     }
 
@@ -134,7 +142,40 @@ public class login extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btn_loginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_loginActionPerformed
+        try {
+            Connection con = databaseconnection.getConnection();
+           
+            
+             String staffID =  txtstaffID.getText();
+             String password =  txtpass.getText();
+             
+            if (staffID.isEmpty() || password.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please enter both Staff ID and Password.");
         
+    }
+    
+             
+             
+             Statement stm = con.createStatement();
+             
+             String sql = "select * from Staff where sid ='"+staffID+"' and  phone= '"+password+"'";
+             ResultSet result =  stm.executeQuery(sql );
+              
+             if(result.next()){
+                 dispose(); // close login page 
+                 HomePageForm homepage = new HomePageForm();
+                  homepage.show(); 
+             }else {
+                  JOptionPane.showMessageDialog(this, " username or password wrong");
+                  txtstaffID.setText("");
+                  txtpass.setText(""); 
+             }
+             con.close();
+             
+      
+        } catch (Exception e) {
+            System.out.println(e.getMessage()); 
+        }
     }//GEN-LAST:event_btn_loginActionPerformed
 
     /**
@@ -163,8 +204,14 @@ public class login extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-
+    
         /* Create and display the form */
+        login login = new login();
+         login.show();
+        
+        
+        
+        
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new login().setVisible(true);
